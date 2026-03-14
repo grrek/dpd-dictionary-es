@@ -386,6 +386,40 @@
     }
     .en-details .en-content b { color: #2A4A6B; }
 
+    /* ── Root info ──────────────────── */
+    .root-block {
+      margin-top: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      background: linear-gradient(135deg, #faf6f0 0%, #f5efe6 100%);
+      border-radius: 5px;
+      border-left: 3px solid var(--color-maroon);
+      font-size: 0.82rem;
+    }
+    .root-label {
+      font-weight: 700; font-size: 0.68rem;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--color-text-light);
+      margin-bottom: 0.15rem;
+    }
+    .root-symbol {
+      font-weight: 700;
+      color: var(--color-maroon);
+      font-size: 0.92rem;
+      text-decoration: none;
+    }
+    .root-symbol:hover { text-decoration: underline; }
+    .root-meaning {
+      color: var(--color-text);
+      font-style: italic;
+      margin-left: 0.3rem;
+    }
+    .root-construction {
+      color: var(--color-text-light);
+      font-size: 0.78rem;
+      margin-top: 0.15rem;
+      font-family: var(--font-mono, monospace);
+    }
+
     /* ── Deconstructor ────────────────── */
     .decon-block {
       margin-top: 0.6rem; padding-top: 0.5rem;
@@ -632,7 +666,7 @@
     // ── State ───────────────────────────
     let sortedKeys = [];
     let strippedKeys = []; // diacritics removed for fuzzy
-    let dataReady = { i2h: false, es: false, en: false, decon: false };
+    let dataReady = { i2h: false, es: false, en: false, decon: false, roots: false };
     let acIndex = -1; // autocomplete selection index
     const HISTORY_KEY = 'dpd_dict_history';
     const MAX_HISTORY = 20;
@@ -715,8 +749,12 @@
         dataReady.en = true;
 
         await loadScript('js/dpd_deconstructor.js', 'Cargando análisis de compuestos...');
-        $progressBar.style.width = '100%';
+        $progressBar.style.width = '92%';
         dataReady.decon = true;
+
+        await loadScript('js/dpd_roots.js', 'Cargando raíces Pāli...');
+        $progressBar.style.width = '100%';
+        dataReady.roots = true;
 
         $loaderStatus.textContent = 'Listo';
         setTimeout(() => {
@@ -850,6 +888,25 @@
       return result;
     }
 
+    // ── Root lookup ────────────────────
+    function findRootInEtymology(etymology) {
+      // Extract root symbol from etymology like "na + √kar + ta"
+      if (!etymology) return null;
+      const match = etymology.match(/√([\w\u0100-\u017F]+)/);  // match √ + pali chars
+      if (!match) return null;
+      const rootClean = '√' + match[1];
+      // Look up in roots data (try exact, then with suffixes 1,2,3)
+      if (!dataReady.roots || typeof defined === 'undefined' || !defined.dpd_roots) return null;
+      const roots = defined.dpd_roots;
+      if (roots[rootClean]) return { symbol: rootClean, data: roots[rootClean] };
+      // Try numbered variants
+      for (let n = 1; n <= 4; n++) {
+        const key = rootClean + ' ' + n;
+        if (roots[key]) return { symbol: key, data: roots[key] };
+      }
+      return { symbol: rootClean, data: null }; // root found in etymology but no meaning available
+    }
+
     // ── Entry renderer ──────────────────
     function lookupAndDisplay(word) {
       const norm = normalize(word);
@@ -919,9 +976,22 @@
           </details>`;
         }
 
-        // Etymology
+        // Root + Etymology
         if (parsed.etymology) {
-          html += `<div class="sense-etymology">[${escapeHtml(parsed.etymology)}]</div>`;
+          const rootInfo = findRootInEtymology(parsed.etymology);
+          if (rootInfo && rootInfo.data) {
+            const meaning = rootInfo.data.es || rootInfo.data.en;
+            const rootClean = rootInfo.symbol.replace('√', '').replace(/ \d+$/, '');
+            const dpdUrl = 'https://dpdict.net/?q=' + encodeURIComponent(rootClean);
+            html += `<div class="root-block">
+              <div class="root-label">Raíz</div>
+              <a class="root-symbol" href="${dpdUrl}" target="_blank" rel="noopener" title="Ver familia de esta raíz en DPD">${escapeHtml(rootInfo.symbol)}</a>
+              <span class="root-meaning">${escapeHtml(meaning)}</span>
+              <div class="root-construction">[${escapeHtml(parsed.etymology)}]</div>
+            </div>`;
+          } else {
+            html += `<div class="sense-etymology">[${escapeHtml(parsed.etymology)}]</div>`;
+          }
         }
 
         html += `</div>`; // .sense-block
