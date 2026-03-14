@@ -420,6 +420,104 @@
       font-family: var(--font-mono, monospace);
     }
 
+    /* ── Root Family Panel ──────────────── */
+    .root-family-panel {
+      margin-top: 0.6rem;
+      padding: 0.6rem 0.8rem;
+      background: linear-gradient(135deg, #faf6f0 0%, #f3ece0 100%);
+      border: 1px solid rgba(91,35,51,0.15);
+      border-left: 3px solid var(--color-maroon);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .root-family-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+    .root-family-title {
+      font-weight: 700;
+      color: var(--color-maroon);
+      font-size: 0.95rem;
+    }
+    .root-family-title em {
+      font-weight: 400;
+      color: var(--color-text);
+      font-size: 0.82rem;
+    }
+    .root-family-close {
+      background: none;
+      border: 1px solid rgba(91,35,51,0.2);
+      border-radius: 4px;
+      color: var(--color-text-light);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 0.4rem;
+      line-height: 1.4;
+    }
+    .root-family-close:hover { background: rgba(91,35,51,0.08); }
+    .root-family-count {
+      font-size: 0.72rem;
+      color: var(--color-text-light);
+      margin-bottom: 0.5rem;
+    }
+    .root-subfamily {
+      margin-bottom: 0.5rem;
+    }
+    .root-subfamily-name {
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: var(--color-maroon);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      padding: 0.15rem 0;
+      border-bottom: 1px dotted rgba(91,35,51,0.2);
+      margin-bottom: 0.25rem;
+    }
+    .root-word-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.2rem 0.1rem;
+    }
+    .root-word-chip {
+      display: inline-block;
+      padding: 0.15rem 0.45rem;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(91,35,51,0.1);
+      border-radius: 3px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      color: var(--color-text);
+      text-decoration: none;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    .root-word-chip:hover {
+      background: var(--color-maroon);
+      color: #fff;
+      border-color: var(--color-maroon);
+    }
+    .root-word-chip .chip-pos {
+      font-size: 0.65rem;
+      color: var(--color-text-light);
+      margin-left: 0.15rem;
+    }
+    .root-word-chip:hover .chip-pos { color: rgba(255,255,255,0.7); }
+    .root-word-chip.chip-unavail {
+      opacity: 0.45;
+      cursor: default;
+      border-style: dashed;
+    }
+    .root-word-chip.chip-unavail:hover {
+      background: rgba(255,255,255,0.7);
+      color: var(--color-text);
+      border-color: rgba(91,35,51,0.1);
+    }
+    .root-word-chip.chip-unavail:hover .chip-pos { color: var(--color-text-light); }
+
     /* ── Deconstructor ────────────────── */
     .decon-block {
       margin-top: 0.6rem; padding-top: 0.5rem;
@@ -734,6 +832,8 @@
         await loadScript('js/dpd_i2h.js', 'Cargando indice de palabras...');
         $progressBar.style.width = '30%';
         dataReady.i2h = true;
+        // Build stripped-diacritics lookup set for root family matching
+        window._i2hStripped = new Set(Object.keys(dpd_i2h).map(stripDiacritics));
 
         await loadScript('js/dpd_ebts_es.js', 'Cargando definiciones en español...');
         $progressBar.style.width = '55%';
@@ -753,8 +853,12 @@
         dataReady.decon = true;
 
         await loadScript('js/dpd_roots.js', 'Cargando raíces Pāli...');
-        $progressBar.style.width = '100%';
+        $progressBar.style.width = '96%';
         dataReady.roots = true;
+
+        await loadScript('js/dpd_root_families.js', 'Cargando familias de raíces...');
+        $progressBar.style.width = '100%';
+        dataReady.rootFamilies = true;
 
         $loaderStatus.textContent = 'Listo';
         setTimeout(() => {
@@ -896,8 +1000,9 @@
       if (!match) return null;
       const rootClean = '√' + match[1];
       // Look up in roots data (try exact, then with suffixes 1,2,3)
-      if (!dataReady.roots || typeof defined === 'undefined' || !defined.dpd_roots) return null;
-      const roots = defined.dpd_roots;
+      const _r = (typeof dpd_roots !== 'undefined') ? dpd_roots : ((typeof defined !== 'undefined' && defined.dpd_roots) ? defined.dpd_roots : null);
+      if (!dataReady.roots || !_r) return null;
+      const roots = _r;
       if (roots[rootClean]) return { symbol: rootClean, data: roots[rootClean] };
       // Try numbered variants
       for (let n = 1; n <= 4; n++) {
@@ -981,14 +1086,16 @@
           const rootInfo = findRootInEtymology(parsed.etymology);
           if (rootInfo && rootInfo.data) {
             const meaning = rootInfo.data.es || rootInfo.data.en;
-            const rootClean = rootInfo.symbol.replace('√', '').replace(/ \d+$/, '');
-            const dpdUrl = 'https://dpdict.net/?q=' + encodeURIComponent(rootClean);
+            const rootKey = rootInfo.symbol;
+            const hasFamily = typeof dpd_root_families !== 'undefined' && dpd_root_families[rootKey];
             html += `<div class="root-block">
               <div class="root-label">Raíz</div>
-              <a class="root-symbol" href="${dpdUrl}" target="_blank" rel="noopener" title="Ver familia de esta raíz en DPD">${escapeHtml(rootInfo.symbol)}</a>
+              <span class="root-symbol" ${hasFamily ? `onclick="showRootFamily('${rootKey.replace(/'/g, "\\\\'")}')" style="cursor:pointer" title="Ver palabras de esta raíz"` : ''}>${escapeHtml(rootInfo.symbol)}</span>
               <span class="root-meaning">${escapeHtml(meaning)}</span>
+              ${hasFamily ? '<span style="font-size:0.68rem;color:var(--color-text-light);margin-left:0.3rem;cursor:pointer" onclick="showRootFamily(\'' + rootKey.replace(/'/g, "\\\\'") + '\')">▶ ver familia</span>' : ''}
               <div class="root-construction">[${escapeHtml(parsed.etymology)}]</div>
-            </div>`;
+            </div>
+            <div id="root-family-container"></div>`;
           } else {
             html += `<div class="sense-etymology">[${escapeHtml(parsed.etymology)}]</div>`;
           }
@@ -1017,6 +1124,90 @@
       d.textContent = s;
       return d.innerHTML;
     }
+
+    // ── Root Family Panel ────────────────
+    window.showRootFamily = function(rootKey) {
+      const container = document.getElementById('root-family-container');
+      if (!container) return;
+
+      // Toggle: if already showing this root, close it
+      if (container.dataset.activeRoot === rootKey && container.innerHTML !== '') {
+        container.innerHTML = '';
+        container.dataset.activeRoot = '';
+        return;
+      }
+
+      const familyData = (typeof dpd_root_families !== 'undefined') ? dpd_root_families[rootKey] : null;
+      if (!familyData) {
+        container.innerHTML = '<div style="padding:0.4rem;color:var(--color-text-light);font-size:0.78rem">No se encontró familia para esta raíz.</div>';
+        container.dataset.activeRoot = rootKey;
+        return;
+      }
+
+      // Get Spanish meaning from dpd_roots if available
+      const _roots = (typeof dpd_roots !== 'undefined') ? dpd_roots : ((typeof defined !== 'undefined' && defined.dpd_roots) ? defined.dpd_roots : null);
+      const rootsData = _roots ? _roots[rootKey] : null;
+      const meaningEs = rootsData ? rootsData.es : null;
+      const meaningEn = familyData.meaning;
+      const meaningDisplay = meaningEs || meaningEn;
+
+      // Count total words
+      let totalWords = 0;
+      familyData.families.forEach(f => { totalWords += f.words.length; });
+
+      let html = '<div class="root-family-panel">';
+      html += '<div class="root-family-header">';
+      html += `<span class="root-family-title">${escapeHtml(rootKey)} <em>${escapeHtml(meaningDisplay)}</em></span>`;
+      html += `<button class="root-family-close" onclick="closeRootFamily()" title="Cerrar">&times;</button>`;
+      html += '</div>';
+      html += `<div class="root-family-count">${totalWords} palabras en ${familyData.families.length} ${familyData.families.length === 1 ? 'grupo' : 'grupos'}</div>`;
+
+      familyData.families.forEach(fam => {
+        html += '<div class="root-subfamily">';
+        if (familyData.families.length > 1) {
+          html += `<div class="root-subfamily-name">${escapeHtml(fam.name)}</div>`;
+        }
+        html += '<div class="root-word-list">';
+        fam.words.forEach(w => {
+          const lemma = w[0];
+          const pos = w[1];
+          // Check if word exists in our dictionary
+          const lemmaClean = lemma.replace(/ \d+$/, '');
+          const inDict = !!(dpd_i2h[lemma] || dpd_i2h[lemmaClean] || dpd_i2h[normalize(lemmaClean)] || _i2hStripped.has(stripDiacritics(lemmaClean)));
+          const cls = 'root-word-chip' + (inDict ? '' : ' chip-unavail');
+          if (inDict) {
+            html += `<span class="${cls}" onclick="searchWord('${lemmaClean.replace(/'/g, "\\'")}')" title="${escapeHtml(pos + ' — ' + (w[2] || ''))}">${escapeHtml(lemmaClean)}<span class="chip-pos">${escapeHtml(pos)}</span></span>`;
+          } else {
+            html += `<span class="${cls}" title="${escapeHtml(pos + ' — ' + (w[2] || '') + ' (no disponible en este diccionario)')}">${escapeHtml(lemmaClean)}<span class="chip-pos">${escapeHtml(pos)}</span></span>`;
+          }
+        });
+        html += '</div></div>';
+      });
+
+      html += '</div>';
+      container.innerHTML = html;
+      container.dataset.activeRoot = rootKey;
+
+      // Scroll panel into view
+      setTimeout(() => {
+        container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 50);
+    };
+
+    window.closeRootFamily = function() {
+      const container = document.getElementById('root-family-container');
+      if (container) {
+        container.innerHTML = '';
+        container.dataset.activeRoot = '';
+      }
+    };
+
+    window.searchWord = function(word) {
+      $input.value = word;
+      $clear.style.display = 'block';
+      lookupAndDisplay(word);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     // ── Share ────────────────────────────
     window.copyLink = function() {

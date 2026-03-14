@@ -1,5 +1,4 @@
-var defined = typeof defined === "undefined" ? {} : defined;
-defined.dpd_roots = {
+dpd_roots = {
   '√acc 1': {en: 'shine, praise', es: 'brillar, alabar'},
   '√acc 2': {en: 'worship', es: 'adorar'},
   '√ad': {en: 'eat', es: 'comer'},
