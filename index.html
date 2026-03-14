@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diccionario Pāli — Digital Pali Dictionary en Español</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Diccionario Pāli-Español con 72,698 definiciones del Digital Pali Dictionary (DPD). Busca cualquier palabra Pāli y obtén su definición en español e inglés.">
+  <meta name="keywords" content="Pali, Pāli, diccionario, dictionary, DPD, Digital Pali Dictionary, español, Spanish, budismo, Buddhism, Theravada, sutta, tipitaka">
+  <meta name="author" content="Digital Pali Dictionary — Ven. Bodhirasa">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="es">
+  <meta name="theme-color" content="#5B2333">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://dhamma-pb.org/dpd-espanol/">
+  <meta property="og:title" content="Diccionario Pāli — Digital Pali Dictionary en Español">
+  <meta property="og:description" content="72,698 definiciones Pāli-Español del Digital Pali Dictionary. Busca cualquier palabra Pāli con definiciones en español e inglés.">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="Diccionario Pāli DPD">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Diccionario Pāli — DPD en Español">
+  <meta name="twitter:description" content="72,698 definiciones Pāli-Español del Digital Pali Dictionary. Busca cualquier palabra Pāli con definiciones en español e inglés.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://dhamma-pb.org/dpd-espanol/">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Gentium+Plus:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --color-maroon: #5B2333;
+      --color-text: #2C2C2C;
+      --color-text-light: #555;
+      --color-bg: #FDFAF5;
+      --color-bg-alt: #F7F2EA;
+      --color-rule: #C4A882;
+      --color-accent: #8B6914;
+      --color-rust: #C95D3E;
+      --page-max-width: 800px;
+      --font-body: 'Gentium Plus', 'Noto Serif', Georgia, serif;
+      --font-heading: 'Cormorant Garamond', 'Times New Roman', serif;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── Loading overlay ──────────────── */
+    #loader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--color-bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      transition: opacity 0.4s;
+    }
+    #loader.done { opacity: 0; pointer-events: none; }
+    #loader h1 {
+      font-family: var(--font-heading);
+      color: var(--color-maroon);
+      font-size: 1.8rem; margin-bottom: 0.3rem;
+    }
+    #loader .loader-sub {
+      color: var(--color-text-light);
+      font-size: 0.9rem; margin-bottom: 1.5rem;
+    }
+    .progress-wrap {
+      width: 280px; height: 6px;
+      background: var(--color-bg-alt);
+      border-radius: 3px; overflow: hidden;
+      border: 1px solid var(--color-rule);
+    }
+    .progress-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--color-accent), var(--color-rust));
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+    #loader .loader-status {
+      margin-top: 0.6rem;
+      font-size: 0.78rem; color: var(--color-text-light);
+    }
+
+    /* ── Header ───────────────────────── */
+    .site-header {
+      background: var(--color-maroon);
+      color: #F5F0E8;
+      text-align: center;
+      padding: 1rem 1rem 0.8rem;
+    }
+    .site-header h1 {
+      font-family: var(--font-heading);
+      font-size: 1.5rem; font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    .site-header .subtitle {
+      font-size: 0.82rem; opacity: 0.8;
+      margin-top: 0.15rem;
+    }
+    .site-header a {
+      color: #F5F0E8; text-decoration: none;
+      opacity: 0.7; font-size: 0.78rem;
+    }
+    .site-header a:hover { opacity: 1; }
+
+    /* ── Main container ───────────────── */
+    .container {
+      max-width: var(--page-max-width);
+      margin: 0 auto;
+      padding: 0 1.2rem;
+    }
+
+    /* ── Search section ───────────────── */
+    .search-section {
+      padding: 1.8rem 0 0.8rem;
+      text-align: center;
+    }
+    .search-wrap {
+      position: relative;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+    #search-input {
+      width: 100%;
+      font-family: var(--font-body);
+      font-size: 1.2rem;
+      padding: 0.7rem 1rem 0.7rem 2.6rem;
+      border: 2px solid var(--color-rule);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--color-text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #search-input:focus { border-color: var(--color-accent); }
+    #search-input::placeholder { color: #aaa; }
+    .search-icon {
+      position: absolute; left: 0.85rem; top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem; color: var(--color-rule);
+      pointer-events: none;
+    }
+    .search-clear {
+      position: absolute; right: 0.7rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      font-size: 1.2rem; color: #aaa; cursor: pointer;
+      display: none; padding: 0.2rem;
+    }
+    .search-clear:hover { color: var(--color-text); }
+
+    /* ── Diacritical keyboard ─────────── */
+    .diacritics {
+      margin-top: 0.5rem;
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 4px;
+    }
+    .diacritics button {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      width: 2rem; height: 2rem;
+      border: 1px solid var(--color-rule);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .diacritics button:hover {
+      background: var(--color-bg-alt);
+      border-color: var(--color-accent);
+    }
+    .diacritics button:active {
+      background: var(--color-accent);
+      color: #fff;
+    }
+
+    /* ── Autocomplete dropdown ────────── */
+    .autocomplete {
+      position: absolute;
+      top: calc(100% + 4px); left: 0; right: 0;
+      background: #fff;
+      border: 1px solid var(--color-rule);
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      max-height: 360px; overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+    .autocomplete.open { display: block; }
+    .ac-item {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      transition: background 0.1s;
+    }
+    .ac-item:last-child { border-bottom: none; }
+    .ac-item:hover, .ac-item.active {
+      background: var(--color-bg-alt);
+    }
+    .ac-item .ac-match {
+      font-weight: 700; color: var(--color-maroon);
+    }
+    .ac-item .ac-count {
+      float: right; font-size: 0.75rem;
+      color: var(--color-text-light);
+      margin-top: 2px;
+    }
+
+    /* ── History chips ────────────────── */
+    .history-section {
+      margin-top: 0.6rem;
+      text-align: center;
+    }
+    .history-section.hidden { display: none; }
+    .history-label {
+      font-size: 0.75rem; color: var(--color-text-light);
+      margin-bottom: 0.3rem;
+    }
+    .history-chips {
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 5px;
+    }
+    .history-chip {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      padding: 0.2rem 0.6rem;
+      border: 1px solid var(--color-rule);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--color-accent);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .history-chip:hover {
+      background: var(--color-bg-alt);
+    }
+
+    /* ── Alphabet bar ─────────────────── */
+    .alpha-bar {
+      margin: 0.8rem 0;
+      padding: 0.5rem 0;
+      border-top: 1px solid var(--color-rule);
+      border-bottom: 1px solid var(--color-rule);
+      display: flex; flex-wrap: wrap;
+      justify-content: center; gap: 2px;
+    }
+    .alpha-bar button {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      min-width: 1.7rem; height: 1.7rem;
+      border: none; border-radius: 3px;
+      background: transparent;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .alpha-bar button:hover {
+      background: var(--color-accent);
+      color: #fff;
+    }
+    .alpha-bar button.active {
+      background: var(--color-maroon);
+      color: #fff;
+    }
+
+    /* ── Results area ─────────────────── */
+    #results {
+      min-height: 200px;
+      padding-bottom: 2rem;
+    }
+
+    /* ── Entry card ───────────────────── */
+    .entry-card {
+      background: #fff;
+      border: 1px solid var(--color-rule);
+      border-left: 4px solid var(--color-maroon);
+      border-radius: 6px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .entry-header {
+      display: flex; align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+      gap: 0.5rem;
+    }
+    .entry-word {
+      font-family: var(--font-heading);
+      font-size: 1.6rem; font-weight: 700;
+      color: var(--color-maroon);
+    }
+    .entry-share {
+      font-size: 0.78rem;
+      color: var(--color-accent);
+      cursor: pointer; border: none;
+      background: none; font-family: var(--font-body);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .entry-share:hover { background: var(--color-bg-alt); }
+
+    /* ── Sense block ──────────────────── */
+    .sense-block {
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px dashed rgba(0,0,0,0.08);
+    }
+    .sense-block:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+    .sense-num {
+      font-size: 0.72rem; font-weight: 700;
+      color: #fff; background: var(--color-text-light);
+      display: inline-block;
+      width: 1.3rem; height: 1.3rem; line-height: 1.3rem;
+      text-align: center; border-radius: 50%;
+      margin-right: 0.4rem; vertical-align: middle;
+    }
+    .pos-badge {
+      display: inline-block;
+      font-size: 0.72rem; font-weight: 700;
+      padding: 0.1rem 0.4rem;
+      background: var(--color-accent);
+      color: #fff; border-radius: 3px;
+      margin-right: 0.3rem;
+      vertical-align: middle;
+      letter-spacing: 0.3px;
+    }
+    .sense-def {
+      margin-top: 0.3rem;
+      font-size: 1rem; line-height: 1.6;
+    }
+    .sense-def b { color: var(--color-maroon); }
+
+    .lang-tag {
+      display: inline-block; font-size: 0.58rem; font-weight: 700;
+      padding: 0 3px; border-radius: 2px;
+      vertical-align: middle; margin-right: 3px;
+      letter-spacing: 0.5px;
+    }
+    .lang-es { background: #E8D5B7; color: #5B2333; }
+    .lang-en { background: #D4E4F7; color: #2A4A6B; }
+
+    .sense-literal {
+      font-style: italic; color: var(--color-text-light);
+      font-size: 0.9rem; margin-top: 0.15rem;
+    }
+    .sense-etymology {
+      font-size: 0.82rem; color: var(--color-accent);
+      margin-top: 0.15rem;
+    }
+
+    /* Collapsible EN */
+    .en-details {
+      margin-top: 0.25rem;
+    }
+    .en-details summary {
+      font-size: 0.82rem; color: var(--color-text-light);
+      cursor: pointer; user-select: none;
+    }
+    .en-details summary:hover { color: var(--color-accent); }
+    .en-details .en-content {
+      margin-top: 0.2rem; padding-left: 0.5rem;
+      border-left: 2px solid var(--color-bg-alt);
+      font-size: 0.9rem; color: var(--color-text-light);
+    }
+    .en-details .en-content b { color: #2A4A6B; }
+
+    /* ── Deconstructor ────────────────── */
+    .decon-block {
+      margin-top: 0.6rem; padding-top: 0.5rem;
+      border-top: 1px dashed rgba(0,0,0,0.1);
+      font-size: 0.82rem; color: var(--color-accent);
+    }
+    .decon-label {
+      font-weight: 700; font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 0.15rem;
+    }
+
+    /* ── Browse list ──────────────────── */
+    .browse-list {
+      columns: 2; column-gap: 1.5rem;
+    }
+    .browse-item {
+      padding: 0.3rem 0;
+      break-inside: avoid;
+      font-size: 0.95rem;
+    }
+    .browse-item a {
+      color: var(--color-text);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .browse-item a:hover { color: var(--color-maroon); }
+    .browse-more {
+      text-align: center; margin-top: 0.8rem;
+    }
+    .browse-more button {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      padding: 0.4rem 1.2rem;
+      border: 1px solid var(--color-rule);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--color-accent);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .browse-more button:hover { background: var(--color-bg-alt); }
+
+    /* ── Welcome state ────────────────── */
+    .welcome {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--color-text-light);
+    }
+    .welcome h2 {
+      font-family: var(--font-heading);
+      color: var(--color-maroon);
+      font-size: 1.3rem; margin-bottom: 0.5rem;
+    }
+    .welcome p { font-size: 0.9rem; max-width: 480px; margin: 0 auto; }
+
+    /* ── Not found ────────────────────── */
+    .not-found {
+      text-align: center; padding: 2rem 0;
+      color: var(--color-text-light);
+      font-style: italic;
+    }
+
+    /* ── Footer ───────────────────────── */
+    .site-footer {
+      border-top: 1px solid var(--color-rule);
+      padding: 1.5rem 0 2rem;
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--color-text-light);
+    }
+    .site-footer a {
+      color: var(--color-maroon);
+      text-decoration: none;
+    }
+    .site-footer a:hover { text-decoration: underline; }
+    .footer-credits {
+      max-width: 560px;
+      margin: 0 auto 0.8rem;
+    }
+    .footer-heading {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-maroon);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.3px;
+    }
+    .footer-thanks {
+      margin-bottom: 0.4rem;
+      line-height: 1.6;
+    }
+    .footer-thanks strong {
+      color: var(--color-text);
+    }
+    .footer-disclaimer {
+      max-width: 560px;
+      margin: 0.8rem auto;
+      padding: 0.7rem 1rem;
+      background: var(--color-bg-alt);
+      border-radius: 6px;
+      border: 1px solid var(--color-rule);
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+    .footer-disclaimer .footer-heading {
+      margin-bottom: 0.3rem;
+    }
+    .footer-disclaimer p {
+      margin-bottom: 0.35rem;
+    }
+    .footer-disclaimer p:last-child {
+      margin-bottom: 0;
+    }
+    .footer-disclaimer em {
+      color: var(--color-text);
+    }
+    .footer-license {
+      margin-top: 0.6rem;
+      padding-top: 0.5rem;
+      border-top: 1px dotted var(--color-rule);
+      font-size: 0.72rem;
+      letter-spacing: 0.3px;
+    }
+    .footer-stats { margin-top: 0.3rem; }
+
+    /* ── Responsive ───────────────────── */
+    @media (max-width: 600px) {
+      .site-header h1 { font-size: 1.25rem; }
+      #search-input { font-size: 1rem; padding: 0.6rem 0.8rem 0.6rem 2.2rem; }
+      .entry-word { font-size: 1.3rem; }
+      .entry-card { padding: 0.9rem 1rem; }
+      .browse-list { columns: 1; }
+      .alpha-bar { gap: 1px; }
+      .alpha-bar button { min-width: 1.5rem; height: 1.5rem; font-size: 0.78rem; }
+      .diacritics button { width: 1.8rem; height: 1.8rem; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading overlay -->
+  <div id="loader">
+    <h1>Diccionario Pāli</h1>
+    <div class="loader-sub">Digital Pali Dictionary en Español</div>
+    <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div class="loader-status" id="loader-status">Preparando...</div>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <h1>Diccionario Pāli &mdash; DPD</h1>
+    <div class="subtitle">72,698 definiciones en Español &middot; Digital Pali Dictionary</div>
+  </header>
+
+  <!-- Search -->
+  <div class="container">
+    <div class="search-section">
+      <div class="search-wrap">
+        <span class="search-icon">&#x1F50D;</span>
+        <input type="text" id="search-input" placeholder="Buscar palabra Pāli..." autocomplete="off" autocapitalize="none" spellcheck="false" disabled>
+        <button class="search-clear" id="search-clear" title="Limpiar">&times;</button>
+        <div class="autocomplete" id="autocomplete"></div>
+      </div>
+      <div class="diacritics" id="diacritics"></div>
+    </div>
+
+    <!-- History -->
+    <div class="history-section hidden" id="history-section">
+      <div class="history-label">Recientes</div>
+      <div class="history-chips" id="history-chips"></div>
+    </div>
+
+    <!-- Alphabet bar -->
+    <div class="alpha-bar" id="alpha-bar"></div>
+
+    <!-- Results -->
+    <div id="results">
+      <div class="welcome" id="welcome">
+        <h2>Busca cualquier palabra Pāli</h2>
+        <p>Escribe en la barra de arriba o navega por letra. Las definiciones se muestran en español con opcion de ver el inglés original.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer container">
+    <div class="footer-credits">
+      <div class="footer-heading">Agradecimientos</div>
+      <p class="footer-thanks">
+        Este diccionario es posible gracias al trabajo del
+        <a href="https://digitalpalidictionary.github.io/" target="_blank" rel="noopener">Digital Pali Dictionary</a>,
+        creado por <strong>Ven. Bodhirasa</strong> (Sri Lanka).
+      </p>
+      <p class="footer-thanks">
+        Agradecemos especialmente a
+        <strong>Ven. Cittadhammo</strong> por la integración JavaScript en
+        <a href="https://www.thebuddhaswords.net/" target="_blank" rel="noopener">thebuddhaswords.net</a>;
+        <strong>Ven. Devamitta</strong> por las correcciones y los cursos de Pāli;
+        <strong>Ven. Gambhiro</strong> por el exportador GoldenDict;
+        y <strong>Falko</strong> por <a href="https://dpdict.net/" target="_blank" rel="noopener">dpdict.net</a>.
+      </p>
+      <p class="footer-thanks">
+        Gracias tambien a <strong>Prof. Bryan Levman</strong>, <strong>Prof. Aleix Ruiz Falques</strong>,
+        <strong>Ven. Sujato</strong>, y a toda la
+        <a href="https://digitalpalidictionary.github.io/thanks/" target="_blank" rel="noopener">comunidad de colaboradores</a>
+        que hacen posible este recurso.
+      </p>
+      <p class="footer-thanks">
+        Traduccion al espanol coordinada por <a href="https://dhamma-pb.org/" target="_blank" rel="noopener">dhamma-pb.org</a>.
+      </p>
+    </div>
+    <div class="footer-disclaimer">
+      <div class="footer-heading">Sobre la traduccion</div>
+      <p>
+        Las 72,698 definiciones en espanol fueron traducidas a partir de las definiciones originales en ingles del DPD
+        con la asistencia del modelo de inteligencia artificial
+        <a href="https://www.anthropic.com/claude" target="_blank" rel="noopener">Claude Opus 4.6</a> (Anthropic),
+        aplicando un proceso de doble revision: traduccion inicial con verificacion terminologica budista
+        (basada en el <em>glosario maestro</em> de Nandisena/Baron) y posterior correccion de estilo y consistencia.
+      </p>
+      <p>
+        Si bien se ha cuidado la calidad de cada entrada, pueden existir imprecisiones o matices mejorables.
+        Agradecemos cualquier sugerencia o correccion a traves del
+        <a href="https://dhamma-pb.org/#contacto" target="_blank" rel="noopener">formulario de contacto de dhamma-pb.org</a>.
+      </p>
+    </div>
+    <div class="footer-license">
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>
+      &middot;
+      <a href="https://github.com/digitalpalidictionary/dpd-db" target="_blank" rel="noopener">GitHub</a>
+      &middot;
+      <a href="https://digitalpalidictionary.github.io/" target="_blank" rel="noopener">DPD Docs</a>
+    </div>
+    <div class="footer-stats" id="footer-stats"></div>
+  </footer>
+
+  <script>
+  (function() {
+    'use strict';
+
+    // ── State ───────────────────────────
+    let sortedKeys = [];
+    let strippedKeys = []; // diacritics removed for fuzzy
+    let dataReady = { i2h: false, es: false, en: false, decon: false };
+    let acIndex = -1; // autocomplete selection index
+    const HISTORY_KEY = 'dpd_dict_history';
+    const MAX_HISTORY = 20;
+    const PALI_ALPHA = 'a ā b c d ḍ e g h i ī j k l ḷ m n ñ ṅ ṇ o p r s t ṭ u ū v y'.split(' ');
+    const DIACRITICS = ['ā','ī','ū','ṃ','ṅ','ñ','ṭ','ḍ','ṇ','ḷ'];
+
+    const POS_MAP = {
+      'adj': 'adjetivo', 'masc': 'masculino', 'fem': 'femenino', 'nt': 'neutro',
+      'pr': 'presente', 'aor': 'aoristo', 'pp': 'participio pasado',
+      'ptp': 'participio', 'prp': 'participio presente', 'fut': 'futuro',
+      'opt': 'optativo', 'imp': 'imperativo', 'cond': 'condicional',
+      'abs': 'absolutivo', 'ger': 'gerundio', 'inf': 'infinitivo',
+      'ind': 'indeclinable', 'pron': 'pronombre', 'prefix': 'prefijo',
+      'suffix': 'sufijo', 'idiom': 'modismo', 'sandhi': 'sandhi',
+      'abbrev': 'abreviatura', 'card': 'cardinal', 'ordin': 'ordinal',
+      'cs': 'causativo', 'letter': 'letra', 've': 'verbo',
+      'root': 'raíz', 'var': 'variante'
+    };
+
+    // ── DOM refs ────────────────────────
+    const $input = document.getElementById('search-input');
+    const $clear = document.getElementById('search-clear');
+    const $ac = document.getElementById('autocomplete');
+    const $results = document.getElementById('results');
+    const $welcome = document.getElementById('welcome');
+    const $histSec = document.getElementById('history-section');
+    const $histChips = document.getElementById('history-chips');
+    const $alphaBar = document.getElementById('alpha-bar');
+    const $loader = document.getElementById('loader');
+    const $progressBar = document.getElementById('progress-bar');
+    const $loaderStatus = document.getElementById('loader-status');
+    const $footerStats = document.getElementById('footer-stats');
+
+    // ── Normalize ───────────────────────
+    function normalize(word) {
+      return word.toLowerCase()
+        .replace(/[''""«»〈〉\u200d]/g, '')
+        .replace(/[.,;:!?'"()\[\]{}]/g, '')
+        .replace(/ṁ/g, 'ṃ')
+        .replace(/\u00b7/g, '')
+        .trim();
+    }
+
+    function stripDiacritics(s) {
+      return s.replace(/[āà]/g,'a').replace(/[īì]/g,'i').replace(/[ūù]/g,'u')
+        .replace(/ṃ/g,'m').replace(/ṁ/g,'m').replace(/ṅ/g,'n')
+        .replace(/ñ/g,'n').replace(/ṭ/g,'t').replace(/ḍ/g,'d')
+        .replace(/ṇ/g,'n').replace(/ḷ/g,'l');
+    }
+
+    // ── Data loading ────────────────────
+    function loadScript(src, label) {
+      return new Promise((resolve, reject) => {
+        $loaderStatus.textContent = label;
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = () => reject(new Error('Error cargando ' + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    async function loadData() {
+      try {
+        await loadScript('js/dpd_i2h.js', 'Cargando indice de palabras...');
+        $progressBar.style.width = '30%';
+        dataReady.i2h = true;
+
+        await loadScript('js/dpd_ebts_es.js', 'Cargando definiciones en español...');
+        $progressBar.style.width = '55%';
+        dataReady.es = true;
+
+        // Enable search after essential data loaded
+        buildSearchIndex();
+        $input.disabled = false;
+        $input.focus();
+
+        await loadScript('js/dpd_ebts.js', 'Cargando definiciones en inglés...');
+        $progressBar.style.width = '85%';
+        dataReady.en = true;
+
+        await loadScript('js/dpd_deconstructor.js', 'Cargando análisis de compuestos...');
+        $progressBar.style.width = '100%';
+        dataReady.decon = true;
+
+        $loaderStatus.textContent = 'Listo';
+        setTimeout(() => {
+          $loader.classList.add('done');
+          setTimeout(() => { $loader.style.display = 'none'; }, 400);
+        }, 300);
+
+        updateFooterStats();
+
+        // Check hash after load
+        if (location.hash) handleHash();
+
+      } catch (err) {
+        $loaderStatus.textContent = 'Error: ' + err.message;
+        $progressBar.style.background = '#c00';
+      }
+    }
+
+    function buildSearchIndex() {
+      if (typeof dpd_i2h === 'undefined') return;
+      sortedKeys = Object.keys(dpd_i2h).filter(k => k.length > 0).sort();
+      strippedKeys = sortedKeys.map(stripDiacritics);
+    }
+
+    // ── Search engine ───────────────────
+    function findPrefix(prefix, max) {
+      if (!prefix || sortedKeys.length === 0) return [];
+      const results = [];
+      // Binary search for start position
+      let lo = 0, hi = sortedKeys.length;
+      while (lo < hi) {
+        const mid = (lo + hi) >>> 1;
+        if (sortedKeys[mid] < prefix) lo = mid + 1; else hi = mid;
+      }
+      for (let i = lo; i < sortedKeys.length && results.length < max; i++) {
+        if (sortedKeys[i].startsWith(prefix)) {
+          results.push(sortedKeys[i]);
+        } else break;
+      }
+      return results;
+    }
+
+    function findFuzzy(query, max) {
+      const stripped = stripDiacritics(query);
+      if (!stripped) return [];
+      const results = [];
+      for (let i = 0; i < strippedKeys.length && results.length < max; i++) {
+        if (strippedKeys[i].startsWith(stripped)) {
+          results.push(sortedKeys[i]);
+        }
+      }
+      return results;
+    }
+
+    function searchWord(query) {
+      const norm = normalize(query);
+      if (!norm) return [];
+      // Try exact prefix first
+      let results = findPrefix(norm, 12);
+      // If few results, try fuzzy
+      if (results.length < 3) {
+        const fuzzy = findFuzzy(norm, 12);
+        const set = new Set(results);
+        fuzzy.forEach(r => { if (!set.has(r)) results.push(r); });
+        results = results.slice(0, 12);
+      }
+      return results;
+    }
+
+    // ── Autocomplete UI ─────────────────
+    function showAutocomplete(items, query) {
+      if (items.length === 0) { hideAutocomplete(); return; }
+      acIndex = -1;
+      const norm = normalize(query);
+      $ac.innerHTML = items.map((item, i) => {
+        const hw = dpd_i2h[item] || [];
+        const highlighted = highlightMatch(item, norm);
+        return `<div class="ac-item" data-index="${i}" data-word="${item}">
+          ${highlighted}
+          <span class="ac-count">${hw.length} ${hw.length === 1 ? 'def' : 'defs'}</span>
+        </div>`;
+      }).join('');
+      $ac.classList.add('open');
+    }
+
+    function highlightMatch(word, query) {
+      if (word.startsWith(query)) {
+        return `<span class="ac-match">${word.substring(0, query.length)}</span>${word.substring(query.length)}`;
+      }
+      return word;
+    }
+
+    function hideAutocomplete() {
+      $ac.classList.remove('open');
+      acIndex = -1;
+    }
+
+    function selectAutocomplete(word) {
+      $input.value = word;
+      hideAutocomplete();
+      lookupAndDisplay(word);
+    }
+
+    // ── Definition parser ───────────────
+    function parseDef(raw) {
+      if (!raw) return null;
+      const result = { pos: '', def: '', literal: '', etymology: '', full: raw };
+
+      // Extract POS (text before first ". ")
+      const posMatch = raw.match(/^(\w+)\.\s/);
+      if (posMatch) {
+        result.pos = posMatch[1];
+        raw = raw.substring(posMatch[0].length);
+      }
+
+      // Extract etymology [...]
+      const etyMatch = raw.match(/\[([^\]]+)\]\s*$/);
+      if (etyMatch) {
+        result.etymology = etyMatch[1];
+        raw = raw.substring(0, raw.lastIndexOf('[' + etyMatch[1] + ']')).trim();
+      }
+
+      // Extract literal: "; lit. ..." or just "lit. ..."
+      const litMatch = raw.match(/;?\s*lit\.\s+(.+?)$/);
+      if (litMatch) {
+        result.literal = litMatch[1].trim();
+        raw = raw.substring(0, raw.indexOf(litMatch[0])).trim();
+      }
+
+      result.def = raw;
+      return result;
+    }
+
+    // ── Entry renderer ──────────────────
+    function lookupAndDisplay(word) {
+      const norm = normalize(word);
+      if (!norm) return;
+
+      // Update URL hash
+      history.replaceState(null, '', '#' + encodeURIComponent(word));
+
+      // Add to history
+      addToHistory(word);
+
+      // Clear welcome and old results
+      $welcome.style.display = 'none';
+
+      // Get headwords
+      const headwords = (typeof dpd_i2h !== 'undefined') ? dpd_i2h[norm] : null;
+      const altNorm = norm.replace(/ṃ/g, 'ṁ');
+      const altHw = (!headwords && typeof dpd_i2h !== 'undefined') ? dpd_i2h[altNorm] : null;
+      const hw = headwords || altHw;
+
+      if (!hw || hw.length === 0) {
+        $results.innerHTML = `<div class="not-found">
+          No se encontró "<strong>${escapeHtml(word)}</strong>" en el diccionario.
+          <br><span style="font-size:0.85rem">Intenta con otra forma de la palabra o navega por letra.</span>
+        </div>`;
+        return;
+      }
+
+      let html = `<div class="entry-card">
+        <div class="entry-header">
+          <span class="entry-word">${escapeHtml(word)}</span>
+          <button class="entry-share" onclick="copyLink()" title="Copiar enlace">&#128279; Compartir</button>
+        </div>`;
+
+      hw.forEach((key, i) => {
+        const esRaw = (typeof dpd_ebts_es !== 'undefined') ? dpd_ebts_es[key] : null;
+        const enRaw = (typeof dpd_ebts !== 'undefined') ? dpd_ebts[key] : null;
+        const esP = parseDef(esRaw);
+        const enP = parseDef(enRaw);
+        const parsed = esP || enP;
+        if (!parsed) return;
+
+        const posLabel = parsed.pos ? (POS_MAP[parsed.pos] || parsed.pos) : '';
+
+        html += `<div class="sense-block">`;
+
+        if (hw.length > 1) {
+          html += `<span class="sense-num">${i + 1}</span>`;
+        }
+        if (posLabel) {
+          html += `<span class="pos-badge">${escapeHtml(parsed.pos)}.</span>`;
+        }
+
+        // ES definition (primary)
+        if (esRaw) {
+          html += `<div class="sense-def"><span class="lang-tag lang-es">ES</span> ${esP.def}</div>`;
+          if (esP.literal) {
+            html += `<div class="sense-literal">lit. ${esP.literal}</div>`;
+          }
+        }
+
+        // EN definition (collapsible)
+        if (enRaw && dataReady.en) {
+          html += `<details class="en-details">
+            <summary><span class="lang-tag lang-en">EN</span> Ver definición en inglés</summary>
+            <div class="en-content">${enP.def}</div>
+          </details>`;
+        }
+
+        // Etymology
+        if (parsed.etymology) {
+          html += `<div class="sense-etymology">[${escapeHtml(parsed.etymology)}]</div>`;
+        }
+
+        html += `</div>`; // .sense-block
+      });
+
+      // Deconstructor
+      if (dataReady.decon && typeof dpd_deconstructor !== 'undefined') {
+        const decon = dpd_deconstructor[norm] || dpd_deconstructor[altNorm] || null;
+        if (decon) {
+          html += `<div class="decon-block">
+            <div class="decon-label">Deconstrucción</div>
+            ${decon}
+          </div>`;
+        }
+      }
+
+      html += `</div>`; // .entry-card
+      $results.innerHTML = html;
+    }
+
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    // ── Share ────────────────────────────
+    window.copyLink = function() {
+      const url = location.href;
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.querySelector('.entry-share');
+        if (btn) {
+          const orig = btn.innerHTML;
+          btn.innerHTML = '&#10003; Copiado';
+          setTimeout(() => { btn.innerHTML = orig; }, 1500);
+        }
+      });
+    };
+
+    // ── Hash routing ────────────────────
+    function handleHash() {
+      const hash = decodeURIComponent(location.hash.substring(1));
+      if (!hash) return;
+
+      if (hash.startsWith('browse/')) {
+        const letter = hash.substring(7);
+        browseLetter(letter);
+        return;
+      }
+
+      $input.value = hash;
+      $clear.style.display = 'block';
+      lookupAndDisplay(hash);
+    }
+
+    window.addEventListener('hashchange', handleHash);
+
+    // ── Alphabet browser ────────────────
+    let browseOffset = 0;
+    const BROWSE_PAGE = 60;
+
+    function browseLetter(letter) {
+      browseOffset = 0;
+      history.replaceState(null, '', '#browse/' + encodeURIComponent(letter));
+
+      // Highlight active letter
+      $alphaBar.querySelectorAll('button').forEach(b => {
+        b.classList.toggle('active', b.dataset.letter === letter);
+      });
+
+      $welcome.style.display = 'none';
+      renderBrowse(letter);
+    }
+
+    function renderBrowse(letter) {
+      const norm = letter.toLowerCase();
+      const all = sortedKeys.filter(k => k.startsWith(norm) || k.startsWith(letter));
+      const page = all.slice(0, browseOffset + BROWSE_PAGE);
+      const hasMore = page.length < all.length;
+
+      let html = `<h3 style="font-family:var(--font-heading);color:var(--color-maroon);margin-bottom:0.6rem;font-size:1.2rem;">
+        Palabras con "${letter}" <span style="font-size:0.8rem;color:var(--color-text-light)">(${all.length})</span>
+      </h3>`;
+      html += `<div class="browse-list">`;
+      page.forEach(word => {
+        html += `<div class="browse-item"><a onclick="selectWord('${word.replace(/'/g, "\\'")}')">${word}</a></div>`;
+      });
+      html += `</div>`;
+      if (hasMore) {
+        html += `<div class="browse-more"><button onclick="loadMoreBrowse('${letter.replace(/'/g, "\\'")}')">Cargar más (${all.length - page.length} restantes)</button></div>`;
+      }
+      $results.innerHTML = html;
+    }
+
+    window.selectWord = function(word) {
+      $input.value = word;
+      $clear.style.display = 'block';
+      lookupAndDisplay(word);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.loadMoreBrowse = function(letter) {
+      browseOffset += BROWSE_PAGE;
+      renderBrowse(letter);
+    };
+
+    // ── History ─────────────────────────
+    function getHistory() {
+      try {
+        return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+      } catch { return []; }
+    }
+
+    function addToHistory(word) {
+      let hist = getHistory();
+      hist = hist.filter(w => w !== word);
+      hist.unshift(word);
+      if (hist.length > MAX_HISTORY) hist = hist.slice(0, MAX_HISTORY);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(hist));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const hist = getHistory();
+      if (hist.length === 0) {
+        $histSec.classList.add('hidden');
+        return;
+      }
+      $histSec.classList.remove('hidden');
+      $histChips.innerHTML = hist.slice(0, 10).map(w =>
+        `<button class="history-chip" onclick="selectWord('${w.replace(/'/g, "\\'")}')">${w}</button>`
+      ).join('');
+    }
+
+    // ── Init UI components ──────────────
+    function initDiacritics() {
+      const el = document.getElementById('diacritics');
+      DIACRITICS.forEach(ch => {
+        const btn = document.createElement('button');
+        btn.textContent = ch;
+        btn.title = ch;
+        btn.addEventListener('click', () => {
+          const pos = $input.selectionStart || $input.value.length;
+          $input.value = $input.value.substring(0, pos) + ch + $input.value.substring(pos);
+          $input.focus();
+          $input.setSelectionRange(pos + 1, pos + 1);
+          onInputChange();
+        });
+        el.appendChild(btn);
+      });
+    }
+
+    function initAlphaBar() {
+      PALI_ALPHA.forEach(letter => {
+        const btn = document.createElement('button');
+        btn.textContent = letter;
+        btn.dataset.letter = letter;
+        btn.addEventListener('click', () => browseLetter(letter));
+        $alphaBar.appendChild(btn);
+      });
+    }
+
+    function updateFooterStats() {
+      const parts = [];
+      if (typeof dpd_ebts_es !== 'undefined') parts.push(Object.keys(dpd_ebts_es).length.toLocaleString() + ' definiciones ES');
+      if (typeof dpd_ebts !== 'undefined') parts.push(Object.keys(dpd_ebts).length.toLocaleString() + ' definiciones EN');
+      if (typeof dpd_i2h !== 'undefined') parts.push(Object.keys(dpd_i2h).length.toLocaleString() + ' formas indexadas');
+      $footerStats.textContent = parts.join(' · ');
+    }
+
+    // ── Event handlers ──────────────────
+    function onInputChange() {
+      const val = $input.value.trim();
+      $clear.style.display = val ? 'block' : 'none';
+      if (val.length < 1) { hideAutocomplete(); return; }
+      const results = searchWord(val);
+      showAutocomplete(results, val);
+    }
+
+    $input.addEventListener('input', onInputChange);
+
+    $input.addEventListener('keydown', (e) => {
+      const items = $ac.querySelectorAll('.ac-item');
+      if (!$ac.classList.contains('open') || items.length === 0) {
+        if (e.key === 'Enter') {
+          const val = $input.value.trim();
+          if (val) {
+            hideAutocomplete();
+            // Try exact match first
+            const norm = normalize(val);
+            if (dpd_i2h && dpd_i2h[norm]) {
+              lookupAndDisplay(val);
+            } else {
+              // Try first suggestion
+              const results = searchWord(val);
+              if (results.length > 0) {
+                selectAutocomplete(results[0]);
+              } else {
+                lookupAndDisplay(val);
+              }
+            }
+          }
+        }
+        return;
+      }
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        acIndex = Math.min(acIndex + 1, items.length - 1);
+        items.forEach((it, i) => it.classList.toggle('active', i === acIndex));
+        items[acIndex]?.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        acIndex = Math.max(acIndex - 1, -1);
+        items.forEach((it, i) => it.classList.toggle('active', i === acIndex));
+        if (acIndex >= 0) items[acIndex]?.scrollIntoView({ block: 'nearest' });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (acIndex >= 0 && items[acIndex]) {
+          selectAutocomplete(items[acIndex].dataset.word);
+        } else if (items.length > 0) {
+          selectAutocomplete(items[0].dataset.word);
+        }
+      } else if (e.key === 'Escape') {
+        hideAutocomplete();
+      }
+    });
+
+    $ac.addEventListener('click', (e) => {
+      const item = e.target.closest('.ac-item');
+      if (item) selectAutocomplete(item.dataset.word);
+    });
+
+    $clear.addEventListener('click', () => {
+      $input.value = '';
+      $clear.style.display = 'none';
+      hideAutocomplete();
+      $results.innerHTML = '';
+      $welcome.style.display = '';
+      history.replaceState(null, '', location.pathname);
+      $alphaBar.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      $input.focus();
+    });
+
+    // Close autocomplete on outside click
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-wrap')) hideAutocomplete();
+    });
+
+    // ── Boot ────────────────────────────
+    initDiacritics();
+    initAlphaBar();
+    renderHistory();
+    loadData();
+
+  })();
+  </script>
+</body>
+</html>
