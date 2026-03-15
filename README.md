@@ -10,6 +10,8 @@
 
 - **Búsqueda instantánea** con autocompletado sobre 92,541 formas indexadas (flexiones, variantes, sandhi)
 - **Definiciones bilingües**: español como idioma principal, inglés original como referencia, con etiqueta `ES` / `EN`
+- **Raíces etimológicas** (√): muestra la raíz Pāli de cada palabra con su significado en español, construcción morfológica y enlace a la familia de palabras
+- **Explorador de familias de raíces**: panel interactivo con 753 raíces y 36,485 palabras agrupadas por sub-familias, con chips clickeables y tooltips en español (cobertura del 81%)
 - **Análisis de compuestos**: deconstrucción automática de palabras compuestas Pāli (sandhi splitting)
 - **Categorías gramaticales** traducidas al español (adjetivo, masculino, participio pasado, etc.)
 - **Navegación alfabética** con barra de letras del alfabeto Pāli completo (incluye ā, ī, ū, ṃ, ṅ, ñ, ṭ, ḍ, ṇ, ḷ)
@@ -52,7 +54,9 @@ dpd-dictionary-es/
 │   ├── dpd_i2h.js          # Índice input→headword (92,541 entradas, ~5.9 MB)
 │   ├── dpd_ebts_es.js      # Definiciones en español (72,698 entradas, ~6.5 MB)
 │   ├── dpd_ebts.js         # Definiciones en inglés (72,698 entradas, ~6.3 MB)
-│   └── dpd_deconstructor.js # Análisis de compuestos (~1.1 MB)
+│   ├── dpd_deconstructor.js # Análisis de compuestos (~1.1 MB)
+│   ├── dpd_roots.js        # Significados de raíces EN+ES (753 raíces, ~41 KB)
+│   └── dpd_root_families.js # Familias de raíces (36,485 palabras, ~2.3 MB)
 └── README.md
 ```
 
@@ -64,16 +68,20 @@ dpd-dictionary-es/
 | `dpd_ebts_es.js` | Definiciones en español. Clave numérica → texto con POS, definición, literales y etimología. | 72,698 | 6.5 MB |
 | `dpd_ebts.js` | Definiciones originales en inglés (misma estructura que ES). | 72,698 | 6.3 MB |
 | `dpd_deconstructor.js` | Descomposición de palabras compuestas y sandhi. | — | 1.1 MB |
+| `dpd_roots.js` | Significados de raíces Pāli en inglés y español. | 753 | 41 KB |
+| `dpd_root_families.js` | Familias de raíces: sub-familias con lemas, POS y significados. | 36,485 palabras | 2.3 MB |
 
-Los archivos JS declaran variables globales (`dpd_i2h`, `dpd_ebts_es`, `dpd_ebts`, `dpd_deconstructor`) que la aplicación consulta en tiempo de ejecución.
+Los archivos JS declaran variables globales (`dpd_i2h`, `dpd_ebts_es`, `dpd_ebts`, `dpd_deconstructor`, `dpd_roots`, `dpd_root_families`) que la aplicación consulta en tiempo de ejecución.
 
 ### Motor de búsqueda
 
 1. **Normalización**: minúsculas, eliminación de puntuación, normalización de `ṁ` → `ṃ`
 2. **Búsqueda por prefijo**: búsqueda binaria sobre las claves ordenadas del índice `dpd_i2h`
-3. **Búsqueda fuzzy**: si hay pocos resultados, busca sin diacríticos (`ā` → `a`, `ṇ` → `n`, etc.)
+3. **Búsqueda fuzzy**: si hay pocos resultados, busca sin diacríticos (`ā` → `a`, `ṇ` → `n`, etc.) usando un mapa pre-construido de 92K claves stripped
 4. **Resolución**: cada forma apunta a uno o más headwords (IDs); para cada ID se busca la definición ES y EN
-5. **Renderizado**: se parsea la definición (POS, texto, literales, etimología) y se muestra con formato bilingüe
+5. **Fallback directo**: si la palabra no está en `dpd_i2h`, se busca directamente como headword key en `dpd_ebts_es`/`dpd_ebts`, incluyendo variantes numeradas (`palabra 1`, `palabra 1.1`, etc.). Esto cubre 13,400+ palabras adicionales que existen como headwords pero no están indexadas como formas buscables
+6. **Raíces**: se extrae el símbolo de raíz (√) de la etimología y se busca en `dpd_roots` para mostrar el significado ES. Click en la raíz despliega el explorador de familias con chips clickeables
+7. **Renderizado**: se parsea la definición (POS, texto, literales, etimología) y se muestra con formato bilingüe
 
 ---
 
