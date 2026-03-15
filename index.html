@@ -8,7 +8,9 @@
   <!-- SEO Meta Tags -->
   <meta name="description" content="Diccionario Pāli-Español con 72,698 definiciones del Digital Pali Dictionary (DPD). Busca cualquier palabra Pāli y obtén su definición en español e inglés.">
   <meta name="keywords" content="Pali, Pāli, diccionario, dictionary, DPD, Digital Pali Dictionary, español, Spanish, budismo, Buddhism, Theravada, sutta, tipitaka">
-  <meta name="author" content="Digital Pali Dictionary — Ven. Bodhirasa">
+  <meta name="author" content="Gregorio Aristizábal — Traducción y desarrollo del sitio">
+  <meta name="developer" content="Gregorio Aristizábal (https://github.com/grrek, https://gregorio.name/)">
+  <meta name="original-author" content="Digital Pali Dictionary — Ven. Bodhirasa">
   <meta name="robots" content="index, follow">
   <meta name="language" content="es">
   <meta name="theme-color" content="#5B2333">
@@ -832,6 +834,12 @@
         await loadScript('js/dpd_i2h.js', 'Cargando indice de palabras...');
         $progressBar.style.width = '30%';
         dataReady.i2h = true;
+        // Build stripped-diacritics map for fuzzy root family matching
+        window._i2hStrippedMap = {};
+        Object.keys(dpd_i2h).forEach(function(k) {
+          var s = stripDiacritics(k);
+          if (!window._i2hStrippedMap[s]) window._i2hStrippedMap[s] = k;
+        });
 
         await loadScript('js/dpd_ebts_es.js', 'Cargando definiciones en español...');
         $progressBar.style.width = '55%';
@@ -1171,7 +1179,7 @@
           const pos = w[1];
           const enMeaning = w[2] || '';
           const lemmaClean = lemma.replace(/ \d+$/, '');
-          // Find the actual i2h key (try exact, clean, normalized, or with long-vowel variants)
+          // Find the actual i2h key (try exact, clean, normalized, or stripped-diacritics fuzzy match)
           function findI2hKey(lm) {
             if (dpd_i2h[lm]) return lm;
             const c = lm.replace(/ \d+$/, '');
@@ -1181,6 +1189,11 @@
             const vowelMap = {'a':'ā','i':'ī','u':'ū'};
             const last = c.slice(-1);
             if (vowelMap[last] && dpd_i2h[c.slice(0,-1) + vowelMap[last]]) return c.slice(0,-1) + vowelMap[last];
+            // Fuzzy: strip all diacritics and match
+            if (window._i2hStrippedMap) {
+              const stripped = stripDiacritics(c);
+              if (window._i2hStrippedMap[stripped]) return window._i2hStrippedMap[stripped];
+            }
             return null;
           }
           const i2hKey = findI2hKey(lemma);
