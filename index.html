@@ -832,8 +832,6 @@
         await loadScript('js/dpd_i2h.js', 'Cargando indice de palabras...');
         $progressBar.style.width = '30%';
         dataReady.i2h = true;
-        // Build stripped-diacritics lookup set for root family matching
-        window._i2hStripped = new Set(Object.keys(dpd_i2h).map(stripDiacritics));
 
         await loadScript('js/dpd_ebts_es.js', 'Cargando definiciones en español...');
         $progressBar.style.width = '55%';
@@ -1171,14 +1169,40 @@
         fam.words.forEach(w => {
           const lemma = w[0];
           const pos = w[1];
-          // Check if word exists in our dictionary
+          const enMeaning = w[2] || '';
           const lemmaClean = lemma.replace(/ \d+$/, '');
-          const inDict = !!(dpd_i2h[lemma] || dpd_i2h[lemmaClean] || dpd_i2h[normalize(lemmaClean)] || _i2hStripped.has(stripDiacritics(lemmaClean)));
+          // Find the actual i2h key (try exact, clean, normalized, or with long-vowel variants)
+          function findI2hKey(lm) {
+            if (dpd_i2h[lm]) return lm;
+            const c = lm.replace(/ \d+$/, '');
+            if (dpd_i2h[c]) return c;
+            if (dpd_i2h[normalize(c)]) return normalize(c);
+            // Try long-vowel ending variants: a→ā, i→ī, u→ū
+            const vowelMap = {'a':'ā','i':'ī','u':'ū'};
+            const last = c.slice(-1);
+            if (vowelMap[last] && dpd_i2h[c.slice(0,-1) + vowelMap[last]]) return c.slice(0,-1) + vowelMap[last];
+            return null;
+          }
+          const i2hKey = findI2hKey(lemma);
+          const inDict = !!i2hKey;
+          // Get Spanish definition for tooltip if available
+          let tipText = pos;
+          if (inDict) {
+            const hwKeys = dpd_i2h[i2hKey];
+            if (hwKeys && hwKeys.length > 0 && typeof dpd_ebts_es !== 'undefined' && dpd_ebts_es[hwKeys[0]]) {
+              const esDef = dpd_ebts_es[hwKeys[0]].replace(/<[^>]*>/g, '').substring(0, 100);
+              tipText += ' — ' + esDef;
+            } else {
+              tipText += ' — ' + enMeaning;
+            }
+          } else {
+            tipText += ' — ' + enMeaning + ' (no disponible)';
+          }
           const cls = 'root-word-chip' + (inDict ? '' : ' chip-unavail');
           if (inDict) {
-            html += `<span class="${cls}" onclick="searchWord('${lemmaClean.replace(/'/g, "\\'")}')" title="${escapeHtml(pos + ' — ' + (w[2] || ''))}">${escapeHtml(lemmaClean)}<span class="chip-pos">${escapeHtml(pos)}</span></span>`;
+            html += `<span class="${cls}" onclick="searchWord('${i2hKey.replace(/'/g, "\\'")}')" title="${escapeHtml(tipText)}">${escapeHtml(lemmaClean)}<span class="chip-pos">${escapeHtml(pos)}</span></span>`;
           } else {
-            html += `<span class="${cls}" title="${escapeHtml(pos + ' — ' + (w[2] || '') + ' (no disponible en este diccionario)')}">${escapeHtml(lemmaClean)}<span class="chip-pos">${escapeHtml(pos)}</span></span>`;
+            html += `<span class="${cls}" title="${escapeHtml(tipText)}">${escapeHtml(lemmaClean)}<span class="chip-pos">${escapeHtml(pos)}</span></span>`;
           }
         });
         html += '</div></div>';
