@@ -1022,6 +1022,34 @@
       return { symbol: rootClean, data: null }; // root found in etymology but no meaning available
     }
 
+    // ── Direct headword lookup (for words not in i2h but in ebts_es/ebts) ──
+    // Returns array of matching headword keys, or null
+    function findDirectHeadwords(word) {
+      const es = typeof dpd_ebts_es !== 'undefined' ? dpd_ebts_es : null;
+      const en = typeof dpd_ebts !== 'undefined' ? dpd_ebts : null;
+      if (!es && !en) return null;
+      const norm = normalize(word);
+      const base = norm.replace(/ \d+(\.\d+)?$/, '');
+      const found = [];
+      // Try exact key first
+      if ((es && es[norm]) || (en && en[norm])) found.push(norm);
+      // If input had no number suffix, collect all numbered variants
+      if (norm === base || found.length === 0) {
+        // Try unnumbered base
+        if (found.indexOf(base) === -1 && ((es && es[base]) || (en && en[base]))) found.push(base);
+        // Try numbered: "word 1", "word 1.1", "word 2", etc.
+        for (let n = 1; n <= 5; n++) {
+          const key = base + ' ' + n;
+          if ((es && es[key]) || (en && en[key])) found.push(key);
+          for (let m = 1; m <= 3; m++) {
+            const dotKey = base + ' ' + n + '.' + m;
+            if ((es && es[dotKey]) || (en && en[dotKey])) found.push(dotKey);
+          }
+        }
+      }
+      return found.length > 0 ? found : null;
+    }
+
     // ── Entry renderer ──────────────────
     function lookupAndDisplay(word) {
       const norm = normalize(word);
@@ -1046,6 +1074,10 @@
         const stripped = stripDiacritics(norm);
         const fuzzyKey = window._i2hStrippedMap[stripped];
         if (fuzzyKey) headwords = dpd_i2h[fuzzyKey];
+      }
+      // Fallback: try direct headword key in dpd_ebts_es (covers 21K+ words not in i2h)
+      if (!headwords) {
+        headwords = findDirectHeadwords(word);
       }
       const hw = headwords;
 
@@ -1208,10 +1240,13 @@
             return null;
           }
           const i2hKey = findI2hKey(lemma);
-          const inDict = !!i2hKey;
-          // Get Spanish definition for tooltip if available
+          // Also check direct headword in ebts_es/ebts (covers 21K+ words not in i2h)
+          const directHws = !i2hKey ? (findDirectHeadwords(lemmaClean) || findDirectHeadwords(lemma)) : null;
+          const directHw = directHws ? directHws[0] : null;
+          const isAvailable = !!(i2hKey || directHw);
+          // Get Spanish definition for tooltip
           let tipText = pos;
-          if (inDict) {
+          if (i2hKey) {
             const hwKeys = dpd_i2h[i2hKey];
             if (hwKeys && hwKeys.length > 0 && typeof dpd_ebts_es !== 'undefined' && dpd_ebts_es[hwKeys[0]]) {
               const esDef = dpd_ebts_es[hwKeys[0]].replace(/<[^>]*>/g, '').substring(0, 100);
@@ -1219,12 +1254,16 @@
             } else {
               tipText += ' — ' + enMeaning;
             }
+          } else if (directHw && typeof dpd_ebts_es !== 'undefined' && dpd_ebts_es[directHw]) {
+            const esDef = dpd_ebts_es[directHw].replace(/<[^>]*>/g, '').substring(0, 100);
+            tipText += ' — ' + esDef;
           } else {
-            tipText += ' — ' + enMeaning + ' (no disponible)';
+            tipText += ' — ' + enMeaning + (isAvailable ? '' : ' (no disponible)');
           }
-          const cls = 'root-word-chip' + (inDict ? '' : ' chip-unavail');
-          if (inDict) {
-            html += `<span class="${cls}" onclick="searchWord('${i2hKey.replace(/'/g, "\\'")}')" title="${escapeHtml(tipText)}">${escapeHtml(lemmaClean)}<span class="chip-pos">${escapeHtml(pos)}</span></span>`;
+          const searchKey = i2hKey || (directHw ? lemmaClean : null);
+          const cls = 'root-word-chip' + (isAvailable ? '' : ' chip-unavail');
+          if (isAvailable) {
+            html += `<span class="${cls}" onclick="searchWord('${(searchKey || lemmaClean).replace(/'/g, "\\'")}')" title="${escapeHtml(tipText)}">${escapeHtml(lemmaClean)}<span class="chip-pos">${escapeHtml(pos)}</span></span>`;
           } else {
             html += `<span class="${cls}" title="${escapeHtml(tipText)}">${escapeHtml(lemmaClean)}<span class="chip-pos">${escapeHtml(pos)}</span></span>`;
           }
