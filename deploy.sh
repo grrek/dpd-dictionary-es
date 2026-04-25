@@ -19,7 +19,11 @@ LOCAL_PATH="$(cd "$(dirname "$0")" && pwd)"
 case "${1:-sync}" in
   sync|push)
     echo "=> Deploying via rsync: $LOCAL_PATH -> $REMOTE:$REMOTE_PATH/"
-    rsync -avzL "$LOCAL_PATH/" "$REMOTE:$REMOTE_PATH/"
+    rsync -avzL \
+      --exclude='.git/' \
+      --exclude='.gitignore' \
+      --exclude='.DS_Store' \
+      "$LOCAL_PATH/" "$REMOTE:$REMOTE_PATH/"
     echo "=> Done. Live at https://dhamma-pb.org/dpd-espanol/"
     ;;
 
