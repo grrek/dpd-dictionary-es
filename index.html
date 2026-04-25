@@ -101,11 +101,26 @@
       height: 100%; width: 0%;
       background: linear-gradient(90deg, var(--color-accent), var(--color-rust));
       border-radius: 3px;
-      transition: width 0.3s;
+      transition: width 0.2s linear;
     }
     #loader .loader-status {
       margin-top: 0.6rem;
       font-size: 0.78rem; color: var(--color-text-light);
+    }
+    #loader .loader-bytes {
+      margin-top: 0.15rem;
+      font-size: 0.72rem; color: var(--color-text-light);
+      font-variant-numeric: tabular-nums;
+      opacity: 0.75;
+    }
+    #loader .loader-hint {
+      margin-top: 0.9rem;
+      max-width: 340px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--color-text-light);
+      font-style: italic;
+      line-height: 1.4;
     }
 
     /* ── Header ───────────────────────── */
@@ -681,7 +696,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <h1>Diccionario Pāli</h1>
     <div class="loader-sub">Digital Pali Dictionary en Español</div>
     <div class="progress-wrap"><div class="progress-bar" id="progress-bar"></div></div>
-    <div class="loader-status" id="loader-status">Preparando...</div>
+    <div class="loader-status" id="loader-status">Preparando…</div>
+    <div class="loader-bytes" id="loader-bytes">0 / 22 MB</div>
+    <p class="loader-hint">
+      La primera carga descarga unos 22 MB de datos y puede tardar algunos segundos.
+      Las siguientes visitas serán casi instantáneas gracias al caché del navegador.
+    </p>
   </div>
 
   <!-- Header -->
@@ -715,7 +735,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="results">
       <div class="welcome" id="welcome">
         <h2>Busca cualquier palabra Pāli</h2>
-        <p>Escribe en la barra de arriba o navega por letra. Las definiciones se muestran en español con opcion de ver el inglés original.</p>
+        <p>Escribe en la barra de arriba o navega por letra. Las definiciones se muestran en español con opción de ver el inglés original.</p>
       </div>
     </div>
   </div>
@@ -738,27 +758,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         y <strong>Falko</strong> por <a href="https://dpdict.net/" target="_blank" rel="noopener">dpdict.net</a>.
       </p>
       <p class="footer-thanks">
-        Gracias tambien a <strong>Prof. Bryan Levman</strong>, <strong>Prof. Aleix Ruiz Falques</strong>,
-        <strong>Ven. Sujato</strong>, y a toda la
+        Gracias también a <strong>Ven. Nandisena</strong>, <strong>Prof. Bryan Levman</strong>,
+        <strong>Prof. Aleix Ruiz Falqués</strong>, <strong>Ven. Sujato</strong>, y a toda la
         <a href="https://digitalpalidictionary.github.io/thanks/" target="_blank" rel="noopener">comunidad de colaboradores</a>
         que hacen posible este recurso.
       </p>
       <p class="footer-thanks">
-        Traduccion al espanol coordinada por <a href="https://dhamma-pb.org/" target="_blank" rel="noopener">dhamma-pb.org</a>.
+        Traducción al español coordinada por <a href="https://dhamma-pb.org/" target="_blank" rel="noopener">dhamma-pb.org</a>.
       </p>
     </div>
     <div class="footer-disclaimer">
-      <div class="footer-heading">Sobre la traduccion</div>
+      <div class="footer-heading">Sobre la traducción</div>
       <p>
-        Las 72,698 definiciones en espanol fueron traducidas a partir de las definiciones originales en ingles del DPD
+        Las 72,698 definiciones en español fueron traducidas a partir de las definiciones originales en inglés del DPD
         con la asistencia del modelo de inteligencia artificial
         <a href="https://www.anthropic.com/claude" target="_blank" rel="noopener">Claude Opus 4.6</a> (Anthropic),
-        aplicando un proceso de doble revision: traduccion inicial con verificacion terminologica budista
-        (basada en el <em>glosario maestro</em> de Nandisena/Baron) y posterior correccion de estilo y consistencia.
+        aplicando un proceso de doble revisión: traducción inicial con verificación terminológica budista
+        (basada en el <em>glosario maestro</em> de Nandisena/Baron) y posterior corrección de estilo y consistencia.
       </p>
       <p>
         Si bien se ha cuidado la calidad de cada entrada, pueden existir imprecisiones o matices mejorables.
-        Agradecemos cualquier sugerencia o correccion a traves del
+        Agradecemos cualquier sugerencia o corrección a través del
         <a href="https://dhamma-pb.org/#contacto" target="_blank" rel="noopener">formulario de contacto de dhamma-pb.org</a>.
       </p>
     </div>
@@ -811,6 +831,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     const $loader = document.getElementById('loader');
     const $progressBar = document.getElementById('progress-bar');
     const $loaderStatus = document.getElementById('loader-status');
+    const $loaderBytes = document.getElementById('loader-bytes');
     const $footerStats = document.getElementById('footer-stats');
 
     // ── Normalize ───────────────────────
@@ -830,49 +851,90 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         .replace(/ṇ/g,'n').replace(/ḷ/g,'l');
     }
 
-    // ── Data loading ────────────────────
-    function loadScript(src, label) {
+    // ── Data loading (byte-level progress) ────
+    // File sizes are uncompressed bytes — used for weighting overall progress
+    // even when the server sends gzipped responses with no Content-Length.
+    const DATA_FILES = [
+      { src: 'js/dpd_i2h.js',           label: 'Cargando índice de palabras…',         size: 6232614, key: 'i2h' },
+      { src: 'js/dpd_ebts_es.js',       label: 'Cargando definiciones en español…',    size: 6817433, key: 'es' },
+      { src: 'js/dpd_ebts.js',          label: 'Cargando definiciones en inglés…',     size: 6555617, key: 'en' },
+      { src: 'js/dpd_deconstructor.js', label: 'Cargando análisis de compuestos…',     size: 1105296, key: 'decon' },
+      { src: 'js/dpd_roots.js',         label: 'Cargando raíces Pāli…',                size:   41774, key: 'roots' },
+      { src: 'js/dpd_root_families.js', label: 'Cargando familias de raíces…',         size: 2428264, key: 'rootFamilies' }
+    ];
+    const TOTAL_BYTES = DATA_FILES.reduce((s, f) => s + f.size, 0);
+
+    function fmtMB(bytes) {
+      return (bytes / 1048576).toFixed(1);
+    }
+
+    function updateProgress(completedBytes, currentFileBytes) {
+      const loaded = completedBytes + currentFileBytes;
+      const pct = Math.min(99.5, (loaded / TOTAL_BYTES) * 100);
+      $progressBar.style.width = pct.toFixed(1) + '%';
+      $loaderBytes.textContent = fmtMB(loaded) + ' / ' + fmtMB(TOTAL_BYTES) + ' MB';
+    }
+
+    function loadScriptWithProgress(file, completedBytes) {
       return new Promise((resolve, reject) => {
-        $loaderStatus.textContent = label;
-        const s = document.createElement('script');
-        s.src = src;
-        s.onload = resolve;
-        s.onerror = () => reject(new Error('Error cargando ' + src));
-        document.head.appendChild(s);
+        $loaderStatus.textContent = file.label;
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', file.src, true);
+        xhr.responseType = 'blob';
+        xhr.onprogress = (e) => {
+          let fileBytes;
+          if (e.lengthComputable && e.total > 0) {
+            // Use fraction of this file's progress, scaled to its known uncompressed size,
+            // so gzipped (smaller `total`) and uncompressed responses both produce
+            // a sensible overall percentage.
+            fileBytes = (e.loaded / e.total) * file.size;
+          } else {
+            fileBytes = Math.min(e.loaded, file.size);
+          }
+          updateProgress(completedBytes, fileBytes);
+        };
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const blobUrl = URL.createObjectURL(xhr.response);
+            const s = document.createElement('script');
+            s.src = blobUrl;
+            s.onload = () => {
+              URL.revokeObjectURL(blobUrl);
+              dataReady[file.key] = true;
+              resolve();
+            };
+            s.onerror = () => {
+              URL.revokeObjectURL(blobUrl);
+              reject(new Error('Error ejecutando ' + file.src));
+            };
+            document.head.appendChild(s);
+          } else {
+            reject(new Error('Error cargando ' + file.src + ' (HTTP ' + xhr.status + ')'));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Error de red al cargar ' + file.src));
+        xhr.send();
       });
     }
 
     async function loadData() {
       try {
-        await loadScript('js/dpd_i2h.js', 'Cargando indice de palabras...');
-        $progressBar.style.width = '30%';
-        dataReady.i2h = true;
+        let completedBytes = 0;
+        for (const file of DATA_FILES) {
+          await loadScriptWithProgress(file, completedBytes);
+          completedBytes += file.size;
+          updateProgress(completedBytes, 0);
 
-        await loadScript('js/dpd_ebts_es.js', 'Cargando definiciones en español...');
-        $progressBar.style.width = '55%';
-        dataReady.es = true;
+          // Enable search as soon as index + Spanish definitions are ready
+          if (dataReady.i2h && dataReady.es && $input.disabled) {
+            buildSearchIndex();
+            $input.disabled = false;
+            $input.focus();
+          }
+        }
 
-        // Enable search after essential data loaded
-        buildSearchIndex();
-        $input.disabled = false;
-        $input.focus();
-
-        await loadScript('js/dpd_ebts.js', 'Cargando definiciones en inglés...');
-        $progressBar.style.width = '85%';
-        dataReady.en = true;
-
-        await loadScript('js/dpd_deconstructor.js', 'Cargando análisis de compuestos...');
-        $progressBar.style.width = '92%';
-        dataReady.decon = true;
-
-        await loadScript('js/dpd_roots.js', 'Cargando raíces Pāli...');
-        $progressBar.style.width = '96%';
-        dataReady.roots = true;
-
-        await loadScript('js/dpd_root_families.js', 'Cargando familias de raíces...');
         $progressBar.style.width = '100%';
-        dataReady.rootFamilies = true;
-
+        $loaderBytes.textContent = fmtMB(TOTAL_BYTES) + ' / ' + fmtMB(TOTAL_BYTES) + ' MB';
         $loaderStatus.textContent = 'Listo';
         setTimeout(() => {
           $loader.classList.add('done');
